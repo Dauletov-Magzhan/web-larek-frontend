@@ -7,11 +7,11 @@ export enum ProductCategory {
 }
 
 export enum PaymentMethod {
-    Online = 'online',
-    Offline = 'offline',
+    Online = 'Онлайн',
+    Offline = 'При получении',
 }
 
-export interface IProductItem {
+export interface IProduct{
     id: string;
     category?: ProductCategory;
     title: string;
@@ -21,13 +21,13 @@ export interface IProductItem {
 }
 
 export interface IBasket {
-    products: IProductItem;
+    products: IProduct;
     numbering: number;
     sum: number;
 }
 
 export interface IAppState {
-    catalog: IProductItem[];
+    catalog: IProduct[];
     basket: string[];
     preview: string | null;
     order: IOrderForm | null;
@@ -44,3 +44,10 @@ export interface IOrderForm {
     phone: string;
 }
 
+export interface IOrder extends IOrderForm {
+    items: string[]
+}
+
+export interface IOrderResult {
+    id: string;
+}
