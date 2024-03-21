@@ -1,36 +1,30 @@
 import { Component } from "./base/component";
 import { ensureElement } from "../utils/utils";
+import { IProduct, ProductCategory } from "../types";
 
 interface ICardActions {
     onClick: (event: MouseEvent) => void;
 }
 
-export interface ICard<T> {
-    title: string;
-    description?: string | string[];
-    image: string;
-}
-
-export class Card<T> extends Component<ICard<T>> {
+export class Card extends Component<IProduct> {
     protected _title: HTMLElement;
     protected _image: HTMLImageElement;
     protected _description?: HTMLElement;
-    protected _button?: HTMLButtonElement;
+    protected _category: HTMLElement;
+    protected _price: HTMLElement;
+
 
     constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
         super(container);
 
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
         this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
-        this._button = container.querySelector(`.gallery__item`);
-        this._description = container.querySelector(`.${blockName}__description`);
+        this._description = container.querySelector(`.${blockName}__text`);
+        this._category = ensureElement<HTMLElement>(`.${blockName}__category`, container);
+        this._price = ensureElement<HTMLElement>(`.${blockName}__price`, container);
 
         if (actions?.onClick) {
-            if (this._button) {
-                this._button.addEventListener('click', actions.onClick);
-            } else {
                 container.addEventListener('click', actions.onClick);
-            }
         }
     }
 
@@ -54,21 +48,55 @@ export class Card<T> extends Component<ICard<T>> {
         this.setImage(this._image, value, this.title)
     }
 
-    set description(value: string | string[]) {
-        if (Array.isArray(value)) {
-            this._description.replaceWith(...value.map(str => {
-                const descTemplate = this._description.cloneNode() as HTMLElement;
-                this.setText(descTemplate, str);
-                return descTemplate;
-            }));
-        } else {
-            this.setText(this._description, value);
+    set category(value: string) {
+        this.setText(this._category, value);
+        switch (value) {
+            case 'софт-скил':
+                this._category.classList.add('card__category_soft');
+                break;
+            case 'хард-скил':
+                this._category.classList.add('card__category_hard');
+                break;
+            case 'другое':
+                this._category.classList.add('card__category_other');
+                break;
+            case 'кнопка':
+                this._category.classList.add('card__category_button');
+                break;
+            case 'дополнительное':
+                this._category.classList.add('card__category_additional');
+                break;
         }
+    }
+
+    get category(): string {
+        return this._category.textContent || '';
+    }
+
+    set price(value: string) {
+        if(value !== null){
+            this.setText(this._price, value + ' синапсов');
+        } else {
+            this.setText(this._price, 'Бесценно');
+        }
+        
+    }
+
+    get price(): string {
+        return this._price.textContent || '';
+    }
+
+    set description(value: string) {
+        this.setText(this._description, value);
+    }
+
+    get description(): string {
+        return this._description.textContent || '';
     }
 }
 
 
-export class CatalogItem extends Card<any> {
+export class CatalogItem extends Card {
 
     constructor(container: HTMLElement, actions?: ICardActions) {
         super('card', container, actions);
