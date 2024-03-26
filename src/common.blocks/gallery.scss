@@ -3,7 +3,7 @@
 
 .gallery {
   @include mixins.container;
-  @include mixins.grid(600px, 24px);
+  @include mixins.grid(400px, 24px);
 
   &__item {
     border: none;

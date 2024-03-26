@@ -3,7 +3,7 @@ import { Api, ApiListResponse } from "./base/api";
 
 export interface IProductApi {
     getProductItem: (id: string) => Promise<IProduct>;
-}
+};
 
 export class ProductApi extends Api {
     readonly cdn: string;
@@ -11,7 +11,7 @@ export class ProductApi extends Api {
     constructor(cdn: string, baseUrl: string, options?: RequestInit) {
         super(baseUrl, options);
         this.cdn = cdn;
-    }
+    };
 
     getProductList(): Promise<IProduct[]> {
         return this.get('/product').then((data: ApiListResponse<IProduct>) =>
@@ -20,7 +20,7 @@ export class ProductApi extends Api {
                 image: this.cdn + item.image
             }))
         );
-    }
+    };
 
     getProductItem(id: string): Promise<IProduct> {
         return this.get(`/product/${id}`).then(
@@ -29,5 +29,5 @@ export class ProductApi extends Api {
                 image: this.cdn + item.image,
             })
         );
-    }
-}
+    };
+};

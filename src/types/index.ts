@@ -4,12 +4,8 @@ export enum ProductCategory {
     Additional = 'дополнительное',
     Button = 'кнопка',
     Other = 'другое',
-}
+};
 
-export enum PaymentMethod {
-    Online = 'Онлайн',
-    Offline = 'При получении',
-}
 
 export interface IProduct{
     id: string;
@@ -18,36 +14,31 @@ export interface IProduct{
     image?: string;
     price: number | null;
     description?: string;
-}
+    index?: number;
+    selected: boolean;
+};
 
 export interface IBasket {
     products: IProduct;
     numbering: number;
     sum: number;
-}
+};
 
 export interface IAppState {
     catalog: IProduct[];
     basket: string[];
     preview: string | null;
     order: IOrderForm | null;
-}
-
-
-export interface IPaymentAddress {
-    payment: PaymentMethod;
-    address: string;
-}
+};
 
 export interface IOrderForm {
-    email: string;
-    phone: string;
-}
+    payment?: string;
+    address?: string;
+    email?: string;
+    phone?: string;
+};
 
 export interface IOrder extends IOrderForm {
-    items: string[]
-}
-
-export interface IOrderResult {
-    id: string;
-}
+    items: string[];
+    total: number;
+};
