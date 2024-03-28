@@ -11,7 +11,7 @@
 - src/pages/index.html — HTML-файл главной страницы
 - src/types/index.ts — файл с типами
 - src/index.ts — точка входа приложения
-- src/styles/styles.scss — корневой файл стилей
+- src/scss/styles.scss — корневой файл стилей
 - src/utils/constants.ts — файл с константами
 - src/utils/utils.ts — файл с утилитами
 
@@ -43,302 +43,175 @@ yarn build
 
 ## Документация 
 
-## Типы данных
+### Типы данных
 
 ```
-<!-- Представляет категорию товаров -->
-export enum ProductCategory {
-
-    <!-- Категория мягких навыков. -->
-    SoftSkill = 'софт-скил',
-
-
-    <!-- Категория технических навыков. -->
-    HardSkill = 'хард-скил',
-
-
-    <!-- Дополнительная категория для продуктов, которые не подходят под мягкие или технические навыки. -->
-    Additional = 'дополнительное',
+Представляет категорию товаров
+enum ProductCategory {
+    SoftSkill = 'софт-скил', - Категория мягких навыков.
+    HardSkill = 'хард-скил', - Категория технических навыков.
+    Additional = 'дополнительное', - Дополнительная категория для продуктов, которые не подходят под мягкие или технические навыки.
+    Button = 'кнопка', - Категория для продуктов, представляющих собой кнопки интерфейса пользователя.
+    Other = 'другое', - Другая категория для продуктов, которые не подходят ни под одну из специфических категорий.
+}
 
 
-    <!-- Категория для продуктов, представляющих собой кнопки интерфейса пользователя. -->
-    Button = 'кнопка',
+Представляет продукт.
+interface IProduct {
+    id: string; - Уникальный идентификатор продукта.
+    category?: ProductCategory; - Опциональная категория продукта.
+    title: string; - Название продукта.
+    image?: string; - Опциональный URL изображения, представляющего продукт.
+    price: number | null; - Цена продукта. Может быть null, если цена не применима или недоступна.
+    description?: string; - Опциональное описание продукта.
+    selected: boolean; - Указывает, выбран ли в данный момент продукт.
+}
 
 
-    <!-- Другая категория для продуктов, которые не подходят ни под одну из специфических категорий. -->
-    Other = 'другое',
-};
+Представляет состояние приложения.
+interface IAppState {
+    catalog: IProduct[]; - Массив продуктов в каталоге.
+    basket: string[]; - Массив идентификаторов продуктов в корзине.
+    preview: string | null; - URL предварительного просмотра изображения.
+    order: IOrderForm | null; - Детали формы заказа.
+}
 
 
-<!-- Представляет продукт. -->
-export interface IProduct {
-
-    <!-- Уникальный идентификатор продукта. -->
-    id: string;
-
-
-    <!-- Опциональная категория продукта. -->
-    category?: ProductCategory;
+Представляет детали формы заказа.
+interface IOrderForm {    
+    payment?: string; - Способ оплаты выбранный для заказа.
+    address?: string; - Адрес для доставки заказа.
+    email?: string; - Электронная почта клиента.
+    phone?: string; - Номер телефона клиента.
+}
 
 
-    <!-- Название продукта. -->
-    title: string;
-
-
-    <!-- Опциональный URL изображения, представляющего продукт. -->
-    image?: string;
-
-
-    <!-- Цена продукта. Может быть null, если цена не применима или недоступна. -->
-    price: number | null;
-
-
-    <!-- Опциональное описание продукта. -->
-    description?: string;
-
-
-    <!-- Опциональный индекс для сортировки или упорядочивания продуктов. -->
-    index?: number;
-
-
-    <!-- Указывает, выбран ли в данный момент продукт. -->
-    selected: boolean;
-};
-
-
-<!-- Представляет корзину с продуктами. -->
-export interface IBasket {
-
-    <!-- Массив продуктов в корзине. -->
-    products: IProduct[];
-
-
-    <!-- Нумерация корзины. -->
-    numbering: number;
-
-
-    <!-- Общая сумма продуктов в корзине. -->
-    sum: number;
-};
-
-<!-- Представляет состояние приложения. -->
-export interface IAppState {
-
-    <!-- Массив продуктов в каталоге. -->
-    catalog: IProduct[];
-
-
-    <!-- Массив идентификаторов продуктов в корзине. -->
-    basket: string[];
-
-
-    <!-- URL предварительного просмотра изображения. -->
-    preview: string | null;
-
-
-    <!-- Детали формы заказа. -->
-    order: IOrderForm | null;
-};
-
-<!-- Представляет детали формы заказа. -->
-export interface IOrderForm {
-
-    <!-- Способ оплаты выбранный для заказа. -->
-    payment?: string;
-
-
-    <!-- Адрес для доставки заказа. -->
-    address?: string;
-
-
-    <!-- Электронная почта клиента. -->
-    email?: string;
-
-
-    <!-- Номер телефона клиента. -->
-    phone?: string;
-};
-
-<!-- Представляет заказ содержащий товары и итоговую сумму. -->
-export interface IOrder extends IOrderForm {
-
-    <!-- Массив идентификаторов продуктов в заказе. -->
-    items: string[];
-
-
-    <!-- Общая стоимость заказа. -->
-    total: number;
-};
+Представляет заказ содержащий товары и итоговую сумму.
+interface IOrder extends IOrderForm {
+    items: string[]; - Массив идентификаторов продуктов в заказе.
+    total: number; - Общая стоимость заказа.
+}
 ```
 
 
 ### Модель данных
 
 ```
-Базовый абстрактный класс модели, который предоставляет основные методы и свойства для работы с данными.
-export abstract class Model<T> {
-    constructor(data: Partial<T>, protected events: IEvents) {}
-
-    Сообщить всем что модель поменялась
-    emitChanges(event: string, payload?: object) {}
-}
-
-
 Класс AppState представляет глобальное состояние приложения, содержащее каталог товаров, корзину покупок, данные предпросмотра товара, а также информацию о заказе и ошибки формы заказа.
 Этот класс расширяет базовый абстрактный класс Model, обеспечивая методы и свойства для работы с данными и уведомлением об изменениях в модели.
+class AppState extends Model<IAppState> 
+    catalog: IProduct[]; - Каталог товаров.
+    basket: IProduct[] = []; - Корзина с товарами.
+    preview: string | null; - Карточка текущего предпросматриваемого товара.
+    order: IOrder; - Форма заказа
+    formErrors: IOrderForm = {} - Ошибка формы заказа
 
-export class AppState extends Model<IAppState> {
-    // Каталог товаров.
-    catalog: IProduct[];
-
-    // Корзина с товарами
-    basket: IProduct[] = [];
-
-    // Идентификатор текущего предпросматриваемого товара.
-    preview: string | null;
-
-    // Форма заказа
-    order: IOrder;
-
-    // Ошибка формы заказа
-    formErrors: IOrderForm = {};
-
-
-    // Устанавливает каталог товаров.
-    setCatalog(items: IProduct[]) {};
-
-    // Устанавливает предпросматриваемый товар.
-    setPreview(item: IProduct) {};
-
-    // Сбрасывает выборку товаров.
-    resetSelected() {};
-
-    // Возврящает итоговую сумму.
-    getTotalPrice() {};
-
-    // Добавляет товар в корзину.
-    addToBasket(value: IProduct) {};
-    
-    // Возвращает количество товаров в корзине.
-    getBasketAmount() {};
-
-    // Удаляет товар из корзины.
-    deleteProductBasket(id: string) {};
-
-    // Очищает корзину покупок.
-    clearBasket() {};
-
-    // Устанавливает товары в заказе.
-    setItems() {};
-
-    // Устанавливает значение для поля заказа.
-    setOrderField(field: keyof IOrderForm, value: string) {};
-    
-    // Проверяет контактные данные заказа на валидность.
-    validateContacts() {};
-    
-    // Проверяет данные заказа на валидность.
-    validateOrder() {};
-    
-    // Обновляет информацию о заказе, сбрасывая ее к начальным значениям.
-    refreshOrder() {};
-};
+    Методы:
+    setCatalog(items: IProduct[]) - Устанавливает каталог товаров.
+    setPreview(item: IProduct) - Устанавливает предпросматриваемый товар.
+    resetSelected() - Сбрасывает выборку товаров.
+    getTotalPrice() - Возврящает итоговую сумму.
+    addToBasket(value: IProduct)- Добавляет товар в корзину.
+    getBasketAmount() - Возвращает количество товаров в корзине.
+    deleteProductBasket(id: string) - Удаляет товар из корзины.
+    clearBasket() - Очищает корзину покупок.
+    setItems() - Устанавливает товары в заказе.
+    setOrderField(field: keyof IOrderForm, value: string) - Устанавливает значение для поля заказа.
+    validateContacts() - Проверяет контактные данные заказа на валидность.
+    validateOrder() - Проверяет данные заказа на валидность.
+    refreshOrder() - Обновляет информацию о заказе, сбрасывая ее к начальным значениям.
 ```
 
 
 ### Базовый код
 
 ```
-// Общий класс для работы с API. Предоставляет методы для выполнения HTTP-запросов.
-export class Api {
+Общий класс для работы с API. Предоставляет методы для выполнения HTTP-запросов.
+class Api 
+    readonly baseUrl: string; - Базовый URL для API.
+    protected options: RequestInit; - Опции запроса, такие как заголовки и другие параметры.
 
-    // Базовый URL для API.
-    readonly baseUrl: string;
+    constructor(baseUrl: string, options: RequestInit = {}) 
 
-    // Опции запроса, такие как заголовки и другие параметры.
-    protected options: RequestInit;
-
-    constructor(baseUrl: string, options: RequestInit = {}) {}
-
-
-    // Обрабатывает ответ от сервера.
-    protected handleResponse(response: Response): Promise<object> {}
-
-    // Выполняет HTTP-запрос методом GET.
-    get(uri: string) {}
-
-    // Выполняет HTTP-запрос методом POST.
-    post(uri: string, data: object, method: ApiPostMethods = 'POST') {}
-}
+    Методы:
+    protected handleResponse(response: Response): Promise<object> - Обрабатывает ответ от сервера.
+    get(uri: string) - Выполняет HTTP-запрос методом GET.
+    post(uri: string, data: object, method: ApiPostMethods = 'POST') - Выполняет HTTP-запрос методом POST.
 
 
-// Базовый абстрактный класс компонент
-export abstract class Component<T> {
-    protected constructor(protected readonly container: HTMLElement) {}
+Базовый абстрактный класс компонент
+abstract class Component<T> 
+    protected constructor(protected readonly container: HTMLElement) 
 
-    // Инструментарий для работы с DOM в дочерних компонентах
+    Методы:
+    toggleClass(element: HTMLElement, className: string, force?: boolean) - Переключить класс
+    protected setText(element: HTMLElement, value: unknown) - Установить текстовое содержимое
+    setDisabled(element: HTMLElement, state: boolean) - Сменить статус блокировки
+    protected setHidden(element: HTMLElement) - Скрыть
+    protected setVisible(element: HTMLElement) - Показать
+    protected setImage(element: HTMLImageElement, src: string, alt?: string) - Установить изображение с алтернативным текстом
+    render(data?: Partial<T>): HTMLElement - Вернуть корневой DOM-элемент
 
-    // Переключить класс
-    toggleClass(element: HTMLElement, className: string, force?: boolean) {}
 
-    // Установить текстовое содержимое
-    protected setText(element: HTMLElement, value: unknown) {}
 
-    // Сменить статус блокировки
-    setDisabled(element: HTMLElement, state: boolean) {}
 
-    // Скрыть
-    protected setHidden(element: HTMLElement) {}
+Класс EventEmitter - Брокер событий, классическая реализация в расширенных вариантах есть возможность подписаться на все события
+или слушать события по шаблону например
+class EventEmitter implements IEvents
+	_events: Map<EventName, Set<Subscriber>>;
 
-    // Показать
-    protected setVisible(element: HTMLElement) {}
+	constructor() 
 
-    // Установить изображение с алтернативным текстом
-    protected setImage(element: HTMLImageElement, src: string, alt?: string) { }
+	Методы:
+	on<T extends object>(eventName: EventName, callback: (event: T) => void) - Установить обработчик на событие
+	off(eventName: EventName, callback: Subscriber) - Снять обработчик с события
+	emit<T extends object>(eventName: string, data?: T) - Инициировать событие с данными
+	onAll(callback: (event: EmitterEvent) => void) - Слушать все события
+	offAll() - Сбросить все обработчики
+	trigger<T extends object>(eventName: string, context?: Partial<T>) - Сделать коллбек триггер, генерирующий событие при вызове
 
-    // Вернуть корневой DOM-элемент
-    render(data?: Partial<T>): HTMLElement {}
-}
+
+Базовый абстрактный класс модели, который предоставляет основные методы и свойства для работы с данными.
+abstract class Model<T> 
+    constructor(data: Partial<T>, protected events: IEvents) 
+
+    Методы:
+    emitChanges(event: string, payload?: object) - Сообщить всем что модель поменялась
 ```
 
 
 ### Компоненты модели данных (бизнес-логика)
 
 ```
-export class ProductApi extends Api {
+Класс ProductApi получает информацию о продукте из API
+class ProductApi extends Api 
     readonly cdn: string;
 
-    constructor(cdn: string, baseUrl: string, options?: RequestInit) {};
+    constructor(cdn: string, baseUrl: string, options?: RequestInit)
 
-    // Получает список продуктов.
-    getProductList(): Promise<IProduct[]> {};
-
-    //Получает информацию о продукте по его идентификатору.
-    getProductItem(id: string): Promise<IProduct> {};
-};
+    Методы:
+    getProductList(): Promise<IProduct[]> - Получает список продуктов.
+    getProductItem(id: string): Promise<IProduct> - Получает информацию о продукте по его идентификатору.
 
 
-// Класс Page представляет компонент страницы приложения, управляющий отображением контента на странице.
-export class Page extends Component<IPage> {
+Класс Page представляет компонент страницы приложения, управляющий отображением контента на странице.
+class Page extends Component<IPage> 
     protected _counter: HTMLElement;
     protected _catalog: HTMLElement;
     protected _wrapper: HTMLElement;
     protected _basket: HTMLElement;
 
 
-    constructor(container: HTMLElement, protected events: IEvents) {};
+    constructor(container: HTMLElement, protected events: IEvents)
 
-    // Устанавливает значение счетчика корзины.
-    set counter(value: number) {};
+    Сеттеры:
+    set counter(value: number) - Устанавливает значение счетчика корзины.
+    set catalog(items: HTMLElement[]) - Устанавливает элементы каталога товаров для отображения на странице.
+    set locked(value: boolean) - Устанавливает блокировку страницы.
 
-    // Устанавливает элементы каталога товаров для отображения на странице.
-    set catalog(items: HTMLElement[]) {};
 
-    // Устанавливает блокировку страницы.
-    set locked(value: boolean) {};
-};
-
-export class Card extends Component<IProduct> {
+Класс Card устанавливает элементы карточки товаров
+class Card extends Component<IProduct> 
     protected _title: HTMLElement;
     protected _image: HTMLImageElement;
     protected _description?: HTMLElement;
@@ -346,105 +219,92 @@ export class Card extends Component<IProduct> {
     protected _price: HTMLElement;
     protected _button: HTMLButtonElement;
 
-    constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) { };
+    constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions)  
 
-    // Устанавливает идентификатор карточки товара.
-    set id(value: string) {};
-
-    // Получает идентификатор карточки товара.
-    get id(): string {};
-
-    // Устанавливает заголовок карточки товара.
-    set title(value: string) {};
-
-    // Получает заголовок карточки товара.
-    get title(): string {};
-
-    // Устанавливает изображение карточки товара.
-    set image(value: string) {};
-    
-    // Устанавливает категорию карточки товара и применяет стили в зависимости от категории.
-    set category(value: string) {};
-
-    // Получает категорию карточки товара.
-    get category(): string {};
-
-    // Устанавливает цену карточки товара.
-    set price(value: string) {};
-
-    // Получает цену карточки товара.
-    get price(): string {};
-
-    // Устанавливает описание карточки товара.
-    set description(value: string) {};
-
-    // Получает описание карточки товара.
-    get description(): string {};
-};
+    Сеттеры и геттеры:
+    set id(value: string) - Устанавливает идентификатор карточки товара.
+    get id(): string - Получает идентификатор карточки товара.
+    set title(value: string) - Устанавливает заголовок карточки товара.
+    get title(): string - Получает заголовок карточки товара.
+    set image(value: string) - Устанавливает изображение карточки товара.
+    set category(value: string) - Устанавливает категорию карточки товара и применяет стили в зависимости от категории.
+    get category(): string - Получает категорию карточки товара.
+    set price(value: string) - Устанавливает цену карточки товара.
+    get price(): string - Получает цену карточки товара.
+    set description(value: string) - Устанавливает описание карточки товара.
+    get description(): string - Получает описание карточки товара.
 
 
 Класс Basket представляет компонент корзины покупок, отображающий список выбранных товаров и общую стоимость.
-export class Basket extends Component<IBasketView> {
+class Basket extends Component<IBasketView> 
     protected _list: HTMLElement;
     protected _total: HTMLElement;
     protected _button: HTMLButtonElement;
 
-    constructor(container: HTMLElement, protected events: EventEmitter) {}
+    constructor(container: HTMLElement, protected events: EventEmitter) 
 
-    // Устанавливает элементы списка в корзине.
-    set items(items: HTMLElement[]) {};
+    Сеттеры:
+    set items(items: HTMLElement[]) - Устанавливает элементы списка в корзине.
+    set selected(items: string[]) - Устанавливает выбранные элементы в корзине.
+    set total(total: number) - Устанавливает общую стоимость товаров в корзине.
 
-    // Устанавливает выбранные элементы в корзине.
-    set selected(items: string[]) {};
-
-    // Устанавливает общую стоимость товаров в корзине.
-    set total(total: number) {};
-
-    // Обновляет индексы элементов в корзине.
-    refreshIndex() {}
-}
+    Методы:
+    refreshIndex() - Обновляет индексы элементов в корзине.
 
 
-// Класс StoreItemBasket представляет компонент элемента в корзине магазина, отображающий информацию о товаре в корзине.
-export class StoreItemBasket extends Component<IProductBasket> {
+Класс StoreItemBasket представляет компонент элемента в корзине магазина, отображающий информацию о товаре в корзине.
+class StoreItemBasket extends Component<IProductBasket> 
     protected _index: HTMLElement;
     protected _title: HTMLElement;
     protected _price: HTMLElement;
     protected _button: HTMLButtonElement;
   
-    constructor(protected blockName: string, container: HTMLElement, actions?: IStoreItemBasketActions) {};
+    constructor(protected blockName: string, container: HTMLElement, actions?: IStoreItemBasketActions)
     
-    // Устанавливает заголовок элемента корзины магазина.
-    set title(value: string) {};
-
-    // Устанавливает индекс элемента в корзине магазина.
-    set index(value: number) {};
-
-    // Устанавливает цену элемента в корзине магазина.
-    set price(value: number) {};
-};
+    Сеттеры
+    set title(value: string) - Устанавливает заголовок элемента корзины магазина.
+    set index(value: number) - Устанавливает индекс элемента в корзине магазина.
+    set price(value: number) - Устанавливает цену элемента в корзине магазина.
 
 
-// Класс Order представляет компонент формы заказа, позволяющий выбрать способ оплаты.
-export class Order extends Form<IOrderForm> {
+Класс Order представляет компонент формы заказа, позволяющий выбрать способ оплаты.
+class Order extends Form<IOrderForm> 
     protected _card: HTMLButtonElement;
     protected _cash: HTMLButtonElement;
 
-    constructor(protected blockName: string, container: HTMLFormElement, protected events: IEvents) {};
+    constructor(protected blockName: string, container: HTMLFormElement, protected events: IEvents)
 
-    // Отключает активное состояние кнопок выбора способа оплаты.
-    disableButtons() {};
-};
+    Методы:
+    disableButtons() - Отключает активное состояние кнопок выбора способа оплаты.
 
 
-// Класс `Success` представляет компонент уведомления об успешном действии.
-export class Success extends Component<ISuccess> {
+Класс `Success` представляет компонент уведомления об успешном действии.
+class Success extends Component<ISuccess> 
     protected _button: HTMLButtonElement;
     protected _description: HTMLElement;
 
-    constructor(protected blockName: string, container: HTMLElement, actions?: ISuccessActions) {};
+    constructor(protected blockName: string, container: HTMLElement, actions?: ISuccessActions)
 
-    // Устанавливает описание успешного действия.
-    set description(value: number) {};
-};
+    Сеттеры:
+    set description(value: number) - Устанавливает описание успешного действия.
+```
+
+### Описание событий
+
+```
+'items:changed' - обновление каталога.
+'card-catalog:select' - вызывается метод setPreview объекта appData.
+'card-preview:changed' - вызывает функцию showItem, которая отображает модальное окно с предварительным просмотром товара.
+'card:toBasket' - предназначен для добавления товара в корзину.
+'basket:open' - открывает корзину.
+'basket:delete' - удаляет товар при клике иконки удаление товара в корзине.
+'basket:order' - отображает форму оформления заказа в модальном окне при нажатии на соответствующий элемент.
+'orderFormErrors:change' - реагирует на изменение ошибок в форме заказа.
+'contactsFormErrors:change' - реагирует на изменение ошибок в форме заполнения данных клиента.
+'orderInput:change' - реагирует на изменения в полях формы заказа и обновляет соответствующие данные в приложении.
+'order:submit' - позволяет обработать событие отправки заказа, вычислить общую стоимость заказа, обновить данные о товарах в заказе и отобразить форму для ввода контактной информации в модальном окне.
+'contacts:submit' - реализует отправку данных заказа на сервер при отправке контактной информации из формы, а также обработку успешного и неудачного ответа от сервера.
+'order:success' - позволяет отобразить модальное окно с информацией об успешном оформлении заказа
+'modal:open' - открывает модальное окно.
+'modal:close'- закрывает модальное окно.
 ```
