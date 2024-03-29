@@ -20,7 +20,7 @@ export interface IAppState {
 	catalog: IProduct[];
 	basket: string[];
 	preview: string | null;
-	order: IOrderForm | null;
+	order: IOrder | null;
 }
 
 export interface IOrderForm {

@@ -30,12 +30,6 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order('order', cloneTemplate(orderTemplate), events);
 const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
-const success = new Success('order-success', cloneTemplate(successTemplate), {
-	onClick: () => {
-		events.emit('modal:close');
-		modal.close();
-	},
-});
 
 events.on<CatalogChangeEvent>('items:changed', () => {
 	page.catalog = appData.catalog.map((item) => {
@@ -56,35 +50,20 @@ events.on('card-catalog:select', (item: IProduct) => {
 });
 
 events.on('card-preview:changed', (item: IProduct) => {
-	const showItem = (item: IProduct) => {
-		const card = new CatalogItem(cloneTemplate(cardPreviewTemplate), {
-			onClick: () => events.emit('card:toBasket', item),
-		});
+	const card = new CatalogItem(cloneTemplate(cardPreviewTemplate), {
+		onClick: () => events.emit('card:toBasket', item),
+	});
 
-		modal.render({
-			content: card.render({
-				title: item.title,
-				image: item.image,
-				description: item.description,
-				category: item.category,
-				price: item.price,
-				selected: item.selected,
-			}),
-		});
-	};
-
-	if (item) {
-		api
-			.getProductItem(item.id)
-			.then(() => {
-				showItem(item);
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	} else {
-		modal.close();
-	}
+	modal.render({
+		content: card.render({
+			title: item.title,
+			image: item.image,
+			description: item.description,
+			category: item.category,
+			price: item.price,
+			selected: item.selected,
+		}),
+	});
 });
 
 // Открыть корзину
@@ -184,7 +163,8 @@ events.on('contacts:submit', () => {
 		.then((res) => {
 			events.emit('order:success', res);
 			appData.clearBasket();
-			appData.refreshOrder();
+			contacts.clearContacts();
+			order.clearOrder();
 			order.disableButtons();
 			page.counter = 0;
 			appData.resetSelected();
@@ -195,6 +175,12 @@ events.on('contacts:submit', () => {
 });
 
 events.on('order:success', (res: ApiListResponse<string>) => {
+	const success = new Success('order-success', cloneTemplate(successTemplate), {
+		onClick: () => {
+			events.emit('modal:close');
+			modal.close();
+		},
+	});
 	modal.render({
 		content: success.render({
 			description: res.total,
@@ -211,9 +197,12 @@ events.on('modal:open', () => {
 events.on('modal:close', () => {
 	page.locked = false;
 	appData.refreshOrder();
+	contacts.clearContacts();
+	order.clearOrder();
 });
 
-api.getProductList()
+api
+	.getProductList()
 	.then(appData.setCatalog.bind(appData))
 	.catch((err) => {
 		console.error(err);

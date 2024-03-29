@@ -59,6 +59,12 @@ export class Card extends Component<IProduct> {
 		this.setImage(this._image, value, this.title);
 	}
 
+	set selected(value: boolean) {
+		if (!this._button.disabled) {
+			this._button.disabled = value;
+		}
+	}
+
 	set category(value: ProductCategory) {
 		this.setText(this._category, value);
 		switch (value) {

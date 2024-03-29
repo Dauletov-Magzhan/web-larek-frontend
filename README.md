@@ -153,8 +153,6 @@ abstract class Component<T>
     render(data?: Partial<T>): HTMLElement - Вернуть корневой DOM-элемент
 
 
-
-
 Класс EventEmitter - Брокер событий, классическая реализация в расширенных вариантах есть возможность подписаться на все события
 или слушать события по шаблону например
 class EventEmitter implements IEvents
@@ -227,6 +225,7 @@ class Card extends Component<IProduct>
     set title(value: string) - Устанавливает заголовок карточки товара.
     get title(): string - Получает заголовок карточки товара.
     set image(value: string) - Устанавливает изображение карточки товара.
+    set selected(value: boolean) - устанавливает выбран ли товар.
     set category(value: string) - Устанавливает категорию карточки товара и применяет стили в зависимости от категории.
     get category(): string - Получает категорию карточки товара.
     set price(value: string) - Устанавливает цену карточки товара.

@@ -36,10 +36,18 @@ export class Order extends Form<IOrderForm> {
 		this._cash.classList.remove('button_alt-active');
 		this._card.classList.remove('button_alt-active');
 	}
+
+	clearOrder() {
+		this.container.reset();
+	}
 }
 
 export class Contacts extends Form<IOrderForm> {
 	constructor(container: HTMLFormElement, events: IEvents) {
 		super(container, events);
+	}
+
+	clearContacts() {
+		this.container.reset();
 	}
 }

@@ -25,7 +25,14 @@ export class AppState extends Model<IAppState> {
 	catalog: IProduct[];
 	basket: IProduct[] = [];
 	preview: string | null;
-	order: IOrder;
+	order: IOrder = {
+		items: [],
+		payment: '',
+		total: null,
+		address: '',
+		email: '',
+		phone: '',
+	};
 	formErrors: IOrderForm = {};
 
 	setCatalog(items: IProduct[]) {
@@ -47,7 +54,9 @@ export class AppState extends Model<IAppState> {
 	}
 
 	addToBasket(value: IProduct) {
-		this.basket.push(value);
+		if (!this.basket.includes(value)) {
+			this.basket.push(value);
+		}
 	}
 
 	getBasketAmount() {
